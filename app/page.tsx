@@ -7,10 +7,10 @@ export default async function Home() {
   const waitingList = await getCurrentWaitingList()
 
   return (
-    <main className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Puppy Waiting List</h1>
+          <h1 className="text-3xl font-bold">Today's Waiting List</h1>
           {!waitingList && (
             <form action={createWaitingList}>
               <Button type="submit">
@@ -24,6 +24,11 @@ export default async function Home() {
           <>
             <AddPuppyForm />
             <WaitingList entries={waitingList.entries} />
+            {waitingList.entries.length === 0 && (
+              <p className="text-center text-gray-500 py-8">
+                No puppies in the waiting list yet
+              </p>
+            )}
           </>
         ) : (
           <div className="text-center py-12">
@@ -33,6 +38,6 @@ export default async function Home() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }
