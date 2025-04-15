@@ -59,7 +59,7 @@ export default function Home() {
     <div className="container mx-auto py-4 sm:py-8 px-2 sm:px-4">
       <Toaster />
       <div className="max-w-3xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-8 mb-4 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-8 mb-4 sm:mb-8 mt-12 lg:mt-0">
           <h1 className="text-2xl sm:text-3xl font-bold">Waiting List for {today}</h1>
           {!waitingList && (
             <Button onClick={handleCreateList} className="w-full sm:w-auto">
