@@ -30,6 +30,7 @@ export function WaitingList({ entries: initialEntries, onUpdate }: WaitingListPr
       if (a.status.toUpperCase() !== 'COMPLETED' && b.status.toUpperCase() === 'COMPLETED') return -1;
       return a.position - b.position;
     });
+
     setEntries(sortedEntries);
   }, [initialEntries]);
 
@@ -53,9 +54,51 @@ export function WaitingList({ entries: initialEntries, onUpdate }: WaitingListPr
 
   const handleDragEnd = async () => {
     if (draggedItem) {
-      const newPosition = entries.findIndex(e => e.id === draggedItem.id)
-      await reorderEntries(Number(draggedItem.id), newPosition)
-      setDraggedItem(null)
+      const currentIndex = entries.findIndex(e => e.id === draggedItem.id);
+      const originalIndex = initialEntries.findIndex(e => e.id === draggedItem.id);
+      
+      // If no movement occurred or item is completed, don't reorder
+      if (currentIndex === originalIndex || draggedItem.status.toUpperCase() === 'COMPLETED') {
+        setDraggedItem(null);
+        return;
+      }
+
+      // Get only the waiting entries as completed ones don't affect position
+      const waitingEntries = entries.filter(e => e.status.toUpperCase() !== 'COMPLETED');
+      const currentWaitingIndex = waitingEntries.findIndex(e => e.id === draggedItem.id);
+      
+      let newPosition;
+      if (currentWaitingIndex === 0) {
+        // If moved to first position, use a position less than the first item
+        const firstPosition = waitingEntries[0].position;
+        newPosition = firstPosition > 0 ? Math.floor(firstPosition / 2) : -1;
+      } else if (currentWaitingIndex === waitingEntries.length - 1) {
+        // If moved to last position, use a position greater than the last item
+        const lastPosition = waitingEntries[waitingEntries.length - 1].position;
+        newPosition = lastPosition + 1;
+      } else {
+        // If in middle, always use the average of the surrounding positions
+        const prevPosition = waitingEntries[currentWaitingIndex - 1].position;
+        const nextPosition = waitingEntries[currentWaitingIndex + 1].position;
+        
+        // Ensure we get a position between the two items
+        if (prevPosition < nextPosition) {
+          newPosition = prevPosition + Math.floor((nextPosition - prevPosition) / 2);
+        } else {
+          // If positions are somehow out of order, ensure we still get a valid position
+          newPosition = Math.min(prevPosition, nextPosition) + 1;
+        }
+      }
+
+      try {
+        await reorderEntries(Number(draggedItem.id), newPosition);
+        if (onUpdate) {
+          onUpdate();
+        }
+      } catch (error) {
+        console.error('Failed to reorder:', error);
+      }
+      setDraggedItem(null);
     }
   }
 

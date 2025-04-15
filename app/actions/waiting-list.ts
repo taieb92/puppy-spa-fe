@@ -134,6 +134,8 @@ export async function updateEntryStatus(entryId: number, status: 'COMPLETED' | '
 
 export async function reorderEntries(entryId: number, newPosition: number) {
   try {
+ 
+
     const response = await fetch(`${API_BASE_URL}/api/entries/${entryId}/position`, {
       method: 'PUT',
       headers: {
@@ -143,12 +145,20 @@ export async function reorderEntries(entryId: number, newPosition: number) {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to reorder entry')
+      console.error('[reorderEntries] Error response:', {
+        status: response.status,
+        statusText: response.statusText
+      });
+      throw new Error(`Failed to reorder entry: ${response.status} ${response.statusText}`)
     }
 
+    const responseData = await response.json();
+    console.log('[reorderEntries] Success response:', responseData);
+
     revalidatePath('/')
-    return await response.json()
+    return responseData
   } catch (error) {
+    console.error('[reorderEntries] Exception:', error);
     throw error
   }
 }
