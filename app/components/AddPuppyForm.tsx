@@ -68,17 +68,18 @@ export function AddPuppyForm({ onPuppyAdded }: AddPuppyFormProps) {
   }
 
   return (
-    <Card className="p-4 mb-6">
+    <Card className="p-3 lg:p-4 mb-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid gap-2">
-          <Label htmlFor="puppyName">Puppy Name</Label>
+          <Label htmlFor="puppyName" className="text-sm font-medium">Puppy Name</Label>
           <div className="relative">
             <Input
               id="puppyName"
               value={puppyName}
               onChange={(e) => setPuppyName(e.target.value)}
               required
-              className="w-full"
+              className="w-full pr-24 text-sm"
+              placeholder="Enter puppy name"
             />
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
@@ -87,15 +88,15 @@ export function AddPuppyForm({ onPuppyAdded }: AddPuppyFormProps) {
                   variant="outline"
                   role="combobox"
                   aria-expanded={open}
-                  className="absolute right-0 top-0 h-full"
+                  className="absolute right-0 top-0 h-full text-sm px-3"
                 >
                   Suggestions
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[200px] p-0">
+              <PopoverContent className="w-[200px] p-0" align="end">
                 <Command>
-                  <CommandInput placeholder="Search puppy name..." />
-                  <CommandEmpty>No puppy name found.</CommandEmpty>
+                  <CommandInput placeholder="Search puppy name..." className="text-sm" />
+                  <CommandEmpty className="text-sm p-2">No puppy name found.</CommandEmpty>
                   <CommandGroup>
                     {PUPPY_NAMES.map((name) => (
                       <CommandItem
@@ -104,6 +105,7 @@ export function AddPuppyForm({ onPuppyAdded }: AddPuppyFormProps) {
                           setPuppyName(currentValue)
                           setOpen(false)
                         }}
+                        className="text-sm"
                       >
                         {name}
                       </CommandItem>
@@ -115,38 +117,45 @@ export function AddPuppyForm({ onPuppyAdded }: AddPuppyFormProps) {
           </div>
         </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor="ownerName">Owner Name</Label>
-          <Input
-            id="ownerName"
-            value={ownerName}
-            onChange={(e) => setOwnerName(e.target.value)}
-            required
-          />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="ownerName" className="text-sm font-medium">Owner Name</Label>
+            <Input
+              id="ownerName"
+              value={ownerName}
+              onChange={(e) => setOwnerName(e.target.value)}
+              required
+              className="text-sm"
+              placeholder="Enter owner name"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="service" className="text-sm font-medium">Service Required</Label>
+            <Input
+              id="service"
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              required
+              className="text-sm"
+              placeholder="Enter service type"
+            />
+          </div>
         </div>
 
         <div className="grid gap-2">
-          <Label htmlFor="service">Service Required</Label>
-          <Input
-            id="service"
-            value={service}
-            onChange={(e) => setService(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="arrivalTime">Arrival Time</Label>
+          <Label htmlFor="arrivalTime" className="text-sm font-medium">Arrival Time</Label>
           <Input
             id="arrivalTime"
             type="time"
             value={arrivalTime}
             onChange={(e) => setArrivalTime(e.target.value)}
             required
+            className="text-sm w-full md:w-[200px]"
           />
         </div>
 
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full md:w-auto text-sm">
           Add to Waiting List
         </Button>
       </form>

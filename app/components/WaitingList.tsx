@@ -72,13 +72,12 @@ export function WaitingList({ entries: initialEntries, onUpdate }: WaitingListPr
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {entries.map((entry) => {
-       
         return (
           <Card
             key={entry.id}
-            className={`p-4 cursor-move ${
+            className={`p-3 lg:p-4 cursor-move touch-none ${
               entry.status.toUpperCase() === 'COMPLETED' ? 'opacity-50' : ''
             }`}
             draggable
@@ -86,17 +85,25 @@ export function WaitingList({ entries: initialEntries, onUpdate }: WaitingListPr
             onDragOver={(e) => handleDragOver(e, entry)}
             onDragEnd={handleDragEnd}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">{entry.puppyName}</h3>
-                <p className="text-sm text-gray-500">Owner: {entry.ownerName}</p>
-                <p className="text-sm text-gray-500">Service: {entry.service}</p>
-                <p className="text-sm text-gray-500">Arrived: {new Date(entry.arrivalTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="flex-grow">
+                <h3 className="font-medium text-base mb-2">{entry.puppyName}</h3>
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 text-sm text-gray-500">
+                  <div>Owner: {entry.ownerName}</div>
+                  <div>Service: {entry.service}</div>
+                  <div className="col-span-2 lg:col-span-1">
+                    Arrived: {new Date(entry.arrivalTime).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit'
+                    })}
+                  </div>
+                </div>
               </div>
               {entry.status.toUpperCase() === 'WAITING' && (
                 <Button
                   variant="outline"
                   onClick={() => handleStatusChange(entry.id)}
+                  className="w-full lg:w-auto text-sm whitespace-nowrap"
                 >
                   Mark Complete
                 </Button>

@@ -66,18 +66,18 @@ export default function CalendarPage() {
   }, [date])
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Calendar View</h1>
+    <div className="container mx-auto py-4 px-2 lg:py-8 lg:px-4">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-8">Calendar View</h1>
         
         {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-md">
+          <div className="mb-4 p-3 lg:p-4 bg-red-50 text-red-600 rounded-md text-sm">
             {error}
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+          <Card className="p-2 lg:p-4 min-h-[350px] flex flex-col">
             <Calendar
               mode="single"
               selected={date}
@@ -94,10 +94,17 @@ export default function CalendarPage() {
               }}
               classNames={{
                 day_selected: 'bg-violet-600 text-white hover:bg-violet-500',
-                day_today: 'bg-gray-100 font-bold'
+                day_today: 'bg-gray-100 font-bold',
+                nav_button: 'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+                caption: 'flex justify-center pt-1 relative items-center text-sm font-medium',
+                table: 'w-full border-collapse space-y-1',
+                head_row: 'flex',
+                head_cell: 'text-slate-500 rounded-md w-9 font-normal text-[0.8rem]',
+                row: 'flex w-full mt-2',
+                cell: 'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-violet-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+                day: 'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
               }}
-              className="rounded-md border"
-              disabled={{ before: new Date() }}
+              className="mx-auto"
               components={{
                 DayContent: ({ date: dayDate }) => {
                   const isBusy = busyDates.some(
@@ -108,7 +115,7 @@ export default function CalendarPage() {
                   )
 
                   return (
-                    <div className="relative w-full h-full flex items-center justify-center">
+                    <div className="relative w-full h-full flex items-center justify-center text-sm">
                       {dayDate.getDate()}
                       {isBusy && (
                         <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
@@ -122,33 +129,33 @@ export default function CalendarPage() {
             />
           </Card>
 
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">
+          <Card className="p-3 lg:p-4 min-h-[350px] flex flex-col">
+            <h2 className="text-lg lg:text-xl font-semibold mb-3">
               {date ? format(date, 'EEEE, MMMM d, yyyy') : 'Select a date'}
             </h2>
             
             {loading ? (
               <p className="text-sm text-gray-500">Loading...</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 flex-grow">
                 {entries.length > 0 ? (
                   <>
                     <p className="text-sm font-medium text-violet-600">
                       {entries.length} appointment{entries.length !== 1 ? 's' : ''} scheduled
                     </p>
-                    <div className="space-y-3">
+                    <div className="space-y-2 overflow-y-auto max-h-[calc(100vh-450px)] lg:max-h-[280px]">
                       {entries.map((entry) => (
                         <div 
                           key={entry.id} 
                           className={cn(
-                            "p-3 rounded-md",
+                            "p-3 rounded-md text-sm",
                             entry.status === 'COMPLETED' 
                               ? "bg-green-50 text-green-900" 
                               : "bg-violet-50 text-violet-900"
                           )}
                         >
                           <div className="font-medium">{entry.puppyName}</div>
-                          <div className="text-sm opacity-90">
+                          <div className="mt-1 space-y-0.5">
                             <div>Owner: {entry.ownerName}</div>
                             <div>Service: {entry.service}</div>
                             <div>Time: {new Date(entry.arrivalTime).toLocaleTimeString([], { 
