@@ -15,10 +15,16 @@ export const metadata: Metadata = {
   keywords: ["puppy spa", "pet grooming", "waiting list", "pet services", "appointment management"],
   authors: [{ name: "Puppy Spa Team" }],
   creator: "Puppy Spa",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico" }
+    ]
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://puppyspa.com",
+    url: "https://puppy-spa-fe-damq.vercel.app",
     title: "Puppy Spa - Waiting List Management",
     description: "Efficiently manage your puppy spa's waiting list, appointments, and services.",
     siteName: "Puppy Spa"
@@ -47,8 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#ffffff" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="theme-color" content="#FF69B4" />
       </head>
       <body className={inter.className}>
         <div className="flex min-h-screen">
