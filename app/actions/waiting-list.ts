@@ -29,7 +29,6 @@ export async function createWaitingList() {
     const result = await response.json()
     return { entries: [] } // New list starts empty
   } catch (error) {
-    console.error('Error creating waiting list:', error)
     if (error instanceof Error) {
       throw new Error(`Failed to create waiting list: ${error.message}`)
     }
@@ -93,37 +92,22 @@ export async function addPuppyEntry(entry: NewPuppyEntry) {
 export async function updateEntryStatus(entryId: number, status: 'COMPLETED' | 'WAITING') {
   try {
     const url = `${API_BASE_URL}/api/entries/${entryId}/status`
-    const body = { status }
-    
-    console.log('Updating entry status:', {
-      url,
-      method: 'PUT',
-      body,
-      API_BASE_URL
-    })
-    
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ status }),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Error response:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText
-      })
       throw new Error(`Failed to update entry status: ${response.status} ${response.statusText}`)
     }
 
     revalidatePath('/')
     return await response.json()
   } catch (error) {
-    console.error('Error updating entry status:', error)
     throw error
   }
 }
@@ -152,13 +136,6 @@ export async function reorderEntries(entryId: number, newPosition: number) {
 export async function searchEntries(query: string) {
   try {
     const url = `${API_BASE_URL}/api/entries/list?q=${encodeURIComponent(query)}`
-    console.log('Search request:', {
-      url,
-      API_BASE_URL,
-      query,
-      encodedQuery: encodeURIComponent(query)
-    })
-
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -167,35 +144,62 @@ export async function searchEntries(query: string) {
       cache: 'no-store'
     })
 
-    console.log('Search response:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries())
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Failed to search entries: ${response.status} ${response.statusText}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function getMonthBusyDates(yearMonth: string) {
+  try {
+    const url = `${API_BASE_URL}/api/waiting-lists/month/${yearMonth}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Search error response:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText
-      })
-      throw new Error(`Failed to search entries: ${response.status} ${response.statusText}`)
+      throw new Error(`Failed to fetch busy dates: ${response.status} ${response.statusText}`)
     }
 
-    const data = await response.json()
-    console.log('Search results:', {
-      resultCount: Array.isArray(data) ? data.length : 'not an array',
-      data
+    return await response.json()
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function getEntriesByDate(date: string): Promise<PuppyEntry[]> {
+  try {
+    const url = `${API_BASE_URL}/api/entries/list?date=${date}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
     })
 
-    return data
+    if (response.status === 404) {
+      // Return empty array for 404 responses
+      return []
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Failed to fetch entries: ${response.status} ${response.statusText}`)
+    }
+
+    return await response.json()
   } catch (error) {
-    console.error('Error searching entries:', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
-    })
     throw error
   }
 } 

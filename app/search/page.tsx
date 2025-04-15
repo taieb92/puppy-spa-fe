@@ -1,40 +1,42 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { PUPPY_NAMES } from '../types'
-
-interface SearchResult {
-  puppyName: string
-  lastVisit: string
-  totalVisits: number
-  commonService: string
-}
-
-// Mock data - in real app, this would come from API
-const mockPuppyHistory: SearchResult[] = [
-  {
-    puppyName: 'Max',
-    lastVisit: '2024-03-15',
-    totalVisits: 5,
-    commonService: 'Grooming'
-  },
-  {
-    puppyName: 'Luna',
-    lastVisit: '2024-03-10',
-    totalVisits: 3,
-    commonService: 'Check-up'
-  },
-  // Add more mock data as needed
-]
+import { PuppyEntry } from '../types'
+import { searchEntries } from '../actions/waiting-list'
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  
-  const filteredResults = mockPuppyHistory.filter(result =>
-    result.puppyName.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const [results, setResults] = useState<PuppyEntry[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!searchQuery.trim()) {
+        setResults([])
+        return
+      }
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const data = await searchEntries(searchQuery)
+        setResults(data)
+      } catch (err) {
+        setError('Failed to fetch search results')
+        console.error('Search error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    // Debounce the search to avoid too many requests
+    const timeoutId = setTimeout(performSearch, 300)
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery])
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -44,32 +46,41 @@ export default function SearchPage() {
         <div className="mb-8">
           <Input
             type="search"
-            placeholder="Search puppies..."
+            placeholder="Search puppies by name or owner..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="max-w-md"
           />
         </div>
 
+        {loading && (
+          <p className="text-center text-gray-500 py-4">Loading...</p>
+        )}
+
+        {error && (
+          <p className="text-center text-red-500 py-4">{error}</p>
+        )}
+
         <div className="space-y-4">
-          {filteredResults.map((result) => (
-            <Card key={result.puppyName} className="p-4">
+          {results.map((entry) => (
+            <Card key={entry.id} className="p-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-semibold">{result.puppyName}</h3>
-                  <p className="text-sm text-gray-500">Last visit: {result.lastVisit}</p>
-                  <p className="text-sm text-gray-500">Total visits: {result.totalVisits}</p>
+                  <h3 className="text-lg font-semibold">{entry.puppyName}</h3>
+                  <p className="text-sm text-gray-500">Owner: {entry.ownerName}</p>
+                  <p className="text-sm text-gray-500">Service: {entry.serviceRequired}</p>
+                  <p className="text-sm text-gray-500">Status: {entry.status}</p>
                 </div>
                 <div className="text-right">
                   <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                    {result.commonService}
+                    {new Date(entry.arrivalTime).toLocaleString()}
                   </span>
                 </div>
               </div>
             </Card>
           ))}
 
-          {searchQuery && filteredResults.length === 0 && (
+          {!loading && searchQuery && results.length === 0 && (
             <p className="text-center text-gray-500 py-8">
               No puppies found matching "{searchQuery}"
             </p>

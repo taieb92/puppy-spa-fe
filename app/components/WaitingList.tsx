@@ -61,7 +61,7 @@ export function WaitingList({ entries: initialEntries, onUpdate }: WaitingListPr
 
   const handleStatusChange = async (entryId: string) => {
     try {
-      await updateEntryStatus(Number(entryId), 'COMPLETED')
+      await updateEntryStatus(Number(entryId), 'COMPLETED' as const)
       // Notify parent to refresh the list
       if (onUpdate) {
         onUpdate()
@@ -74,12 +74,7 @@ export function WaitingList({ entries: initialEntries, onUpdate }: WaitingListPr
   return (
     <div className="space-y-4">
       {entries.map((entry) => {
-        console.log('Entry status:', {
-          id: entry.id,
-          status: entry.status,
-          isWaiting: entry.status.toUpperCase() === 'WAITING',
-          rawStatus: JSON.stringify(entry.status)
-        });
+       
         return (
           <Card
             key={entry.id}
