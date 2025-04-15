@@ -90,18 +90,34 @@ export async function addPuppyEntry(entry: NewPuppyEntry) {
   }
 }
 
-export async function updateEntryStatus(entryId: number, status: string) {
+export async function updateEntryStatus(entryId: number, status: 'COMPLETED' | 'WAITING') {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/entries/${entryId}/status`, {
-      method: 'PATCH',
+    const url = `${API_BASE_URL}/api/entries/${entryId}/status`
+    const body = { status }
+    
+    console.log('Updating entry status:', {
+      url,
+      method: 'PUT',
+      body,
+      API_BASE_URL
+    })
+    
+    const response = await fetch(url, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update entry status')
+      const errorText = await response.text()
+      console.error('Error response:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      })
+      throw new Error(`Failed to update entry status: ${response.status} ${response.statusText}`)
     }
 
     revalidatePath('/')
@@ -112,24 +128,23 @@ export async function updateEntryStatus(entryId: number, status: string) {
   }
 }
 
-export async function reorderEntries(entries: PuppyEntry[]) {
+export async function reorderEntries(entryId: number, newPosition: number) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/entries/reorder`, {
-      method: 'PATCH',
+    const response = await fetch(`${API_BASE_URL}/api/entries/${entryId}/position`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ entries }),
+      body: JSON.stringify({ position: newPosition }),
     })
 
     if (!response.ok) {
-      throw new Error('Failed to reorder entries')
+      throw new Error('Failed to reorder entry')
     }
 
     revalidatePath('/')
     return await response.json()
   } catch (error) {
-    console.error('Error reordering entries:', error)
     throw error
   }
 } 

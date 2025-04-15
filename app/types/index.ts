@@ -4,7 +4,7 @@ export type PuppyEntry = {
   ownerName: string;
   service: string;
   arrivalTime: string;
-  status: 'waiting' | 'completed';
+  status: 'WAITING' | 'COMPLETED';
   position: number;
 };
 

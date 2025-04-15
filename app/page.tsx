@@ -69,7 +69,7 @@ export default function Home() {
         {waitingList ? (
           <>
             <AddPuppyForm onPuppyAdded={fetchList} />
-            <WaitingList entries={waitingList.entries} />
+            <WaitingList entries={waitingList.entries} onUpdate={fetchList} />
             {waitingList.entries.length === 0 && (
               <p className="text-center text-gray-500 py-8">
                 No puppies in the waiting list yet
