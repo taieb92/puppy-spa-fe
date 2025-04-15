@@ -147,4 +147,55 @@ export async function reorderEntries(entryId: number, newPosition: number) {
   } catch (error) {
     throw error
   }
+}
+
+export async function searchEntries(query: string) {
+  try {
+    const url = `${API_BASE_URL}/api/entries/list?q=${encodeURIComponent(query)}`
+    console.log('Search request:', {
+      url,
+      API_BASE_URL,
+      query,
+      encodedQuery: encodeURIComponent(query)
+    })
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store'
+    })
+
+    console.log('Search response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Search error response:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      })
+      throw new Error(`Failed to search entries: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    console.log('Search results:', {
+      resultCount: Array.isArray(data) ? data.length : 'not an array',
+      data
+    })
+
+    return data
+  } catch (error) {
+    console.error('Error searching entries:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    })
+    throw error
+  }
 } 
