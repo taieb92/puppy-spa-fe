@@ -28,15 +28,16 @@ export default function CalendarPage() {
         // API returns an object with dates array
         const dates = (data.dates || []).map((dateStr: string) => new Date(dateStr))
         setBusyDates(dates)
-      } catch (err) {
+      } catch (error) {
         setError('Failed to load calendar data')
+        console.error('Failed to load calendar data:', error)
       } finally {
         setLoading(false)
       }
     }
 
     fetchBusyDates()
-  }, [date?.getMonth(), date?.getFullYear()])
+  }, [date])
 
   // Fetch entries when a date is selected
   useEffect(() => {
@@ -49,10 +50,8 @@ export default function CalendarPage() {
         const formattedDate = format(date, 'yyyy-MM-dd')
         const data = await getEntriesByDate(formattedDate)
         setEntries(data)
-      } catch (err) {
-        // Check if it's a 404 error
-        if (err instanceof Error && err.message.includes('404')) {
-          // Treat 404 as empty list
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('404')) {
           setEntries([])
         } else {
           setError('Failed to load appointments')

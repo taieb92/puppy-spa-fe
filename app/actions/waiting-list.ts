@@ -1,6 +1,6 @@
 'use server'
 
-import { PuppyEntry, WaitingList } from '../types'
+import { PuppyEntry, WaitingList } from '../types/index'
 import { revalidatePath } from 'next/cache'
 import { format } from 'date-fns'
 
@@ -27,7 +27,11 @@ export async function createWaitingList() {
 
     revalidatePath('/')
     const result = await response.json()
-    return { entries: [] } // New list starts empty
+    return {
+      id: result.id,
+      date: today,
+      entries: []
+    } as WaitingList
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to create waiting list: ${error.message}`)
@@ -54,7 +58,11 @@ export async function getCurrentWaitingList(): Promise<WaitingList | null> {
     }
 
     const entries = await response.json()
-    return { entries }
+    return {
+      id: today,
+      date: today,
+      entries: entries
+    } as WaitingList
   } catch (error) {
     throw error
   }
@@ -69,6 +77,12 @@ type NewPuppyEntry = {
 
 export async function addPuppyEntry(entry: NewPuppyEntry) {
   try {
+    console.log('[addPuppyEntry] Request:', {
+      url: `${API_BASE_URL}/api/entries`,
+      method: 'POST',
+      body: entry
+    });
+
     const response = await fetch(`${API_BASE_URL}/api/entries`, {
       method: 'POST',
       headers: {
@@ -78,13 +92,20 @@ export async function addPuppyEntry(entry: NewPuppyEntry) {
     })
 
     if (!response.ok) {
+      console.error('[addPuppyEntry] Error:', {
+        status: response.status,
+        statusText: response.statusText
+      });
       throw new Error(`Failed to add puppy entry: ${response.status} ${response.statusText}`)
     }
 
     const responseData = await response.json()
+    console.log('[addPuppyEntry] Response:', responseData);
+    
     revalidatePath('/')
     return responseData
   } catch (error) {
+    console.error('[addPuppyEntry] Exception:', error);
     throw error
   }
 }
@@ -101,7 +122,6 @@ export async function updateEntryStatus(entryId: number, status: 'COMPLETED' | '
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
       throw new Error(`Failed to update entry status: ${response.status} ${response.statusText}`)
     }
 
@@ -145,7 +165,6 @@ export async function searchEntries(query: string) {
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
       throw new Error(`Failed to search entries: ${response.status} ${response.statusText}`)
     }
 
@@ -167,7 +186,6 @@ export async function getMonthBusyDates(yearMonth: string) {
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
       throw new Error(`Failed to fetch busy dates: ${response.status} ${response.statusText}`)
     }
 
@@ -189,12 +207,10 @@ export async function getEntriesByDate(date: string): Promise<PuppyEntry[]> {
     })
 
     if (response.status === 404) {
-      // Return empty array for 404 responses
       return []
     }
 
     if (!response.ok) {
-      const errorText = await response.text()
       throw new Error(`Failed to fetch entries: ${response.status} ${response.statusText}`)
     }
 

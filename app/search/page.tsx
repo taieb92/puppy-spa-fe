@@ -82,7 +82,7 @@ export default function SearchPage() {
 
           {!loading && searchQuery && results.length === 0 && (
             <p className="text-center text-gray-500 py-8">
-              No puppies found matching "{searchQuery}"
+              No puppies found matching &ldquo;{searchQuery}&rdquo;
             </p>
           )}
         </div>

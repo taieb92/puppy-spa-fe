@@ -3,6 +3,7 @@ export type PuppyEntry = {
   puppyName: string;
   ownerName: string;
   service: string;
+  serviceRequired?: string; // for backward compatibility
   arrivalTime: string;
   status: 'WAITING' | 'COMPLETED';
   position: number;
@@ -17,5 +18,7 @@ export type WaitingList = {
 // Mock data for puppy name autocomplete
 export const PUPPY_NAMES = [
   'Max', 'Luna', 'Bella', 'Charlie', 'Lucy',
-  'Cooper', 'Bailey', 'Daisy', 'Milo', 'Sadie'
+  'Cooper', 'Bailey', 'Daisy', 'Milo', 'Sadie',
+  'Molly', 'Buddy', 'Rocky', 'Maggie', 'Bear',
+  'Sophie', 'Tucker', 'Coco', 'Ruby', 'Duke'
 ]; 

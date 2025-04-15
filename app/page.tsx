@@ -19,8 +19,9 @@ export default function Home() {
     try {
       const list = await getCurrentWaitingList()
       setWaitingList(list)
-    } catch (error) {
+    } catch (err) {
       toast.error('Failed to fetch waiting list')
+      console.error('Failed to fetch waiting list:', err)
     } finally {
       setLoading(false)
     }
@@ -33,9 +34,10 @@ export default function Home() {
         setWaitingList(list)
         toast.success('Waiting list created successfully')
       }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to create waiting list"
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to create waiting list"
       toast.error(`Error: ${message}`)
+      console.error('Failed to create waiting list:', err)
     }
   }
 
@@ -61,7 +63,7 @@ export default function Home() {
           <h1 className="text-2xl sm:text-3xl font-bold">Waiting List for {today}</h1>
           {!waitingList && (
             <Button onClick={handleCreateList} className="w-full sm:w-auto">
-              Create Today's List
+              Create Today&apos;s List
             </Button>
           )}
         </div>

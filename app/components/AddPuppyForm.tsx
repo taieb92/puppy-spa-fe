@@ -62,8 +62,9 @@ export function AddPuppyForm({ onPuppyAdded }: AddPuppyFormProps) {
       
       toast.success('Puppy added successfully')
       onPuppyAdded() // Call the callback to refresh the list
-    } catch (error) {
+    } catch (err) {
       toast.error('Failed to add puppy')
+      console.error('Failed to add puppy:', err)
     }
   }
 
